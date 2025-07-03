@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  imputation:
+    build: .
+    volumes:
+      - ./static_files:/imputation/static_files
+      - ./target_genomes:/imputation/target_genomes
+      - ./results:/imputation/results
+    environment:
+      - JAVA_OPTS=-Xmx8g
+    deploy:
+      resources:
+        limits:
+          memory: 10G
+        reservations:
+          memory: 8G
+    command: ["target_genomes/genome_AB.txt"]
+    # Uncomment the line below to run interactively
+    # stdin_open: true
+    # tty: true 

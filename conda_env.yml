@@ -1,0 +1,17 @@
+name: imputation-env
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - python=3.6
+  - numpy=1.19.5
+  - pysam=0.16.0
+  - pybigwig=0.3.17
+  - bx-python=0.8.12
+  - crossmap=0.6.5
+  - openjdk=8.0.412
+  - bcftools
+  - tabix
+  - gzip
+  - sqlite
+  - python-lzo 

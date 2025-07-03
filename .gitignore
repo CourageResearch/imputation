@@ -1,0 +1,68 @@
+# Large data files
+static_files/
+target_genomes/
+
+# Results directories
+*_results/
+
+# Temporary files
+*.tmp
+*.temp
+*.log
+*.out
+*.err
+
+# Docker
+.dockerignore
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.venv/
+
+# Large database files
+*.db
+*.sqlite
+*.sqlite3
+
+# Compressed files
+*.gz
+*.bz2
+*.zip
+*.tar
+*.tar.gz
+
+# VCF and related files
+*.vcf
+*.vcf.gz
+*.bcf
+*.bcf.csi
+*.tbi
+*.idx
+
+# Reference files
+*.fasta
+*.fa
+*.fai
+*.map
+*.bref
+*.bref3
+
+# Chain files
+*.chain
+*.chain.gz 
