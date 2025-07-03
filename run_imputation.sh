@@ -43,7 +43,7 @@ ADDCHR_MAP="${ROOT_DIR}/static_files/scripts/addchr.txt"
 DROPCHR_MAP="${ROOT_DIR}/static_files/scripts/dropchr.txt"
 
 # ---- per-sample folders & files ------------------------------------------- #
-OUT_DIR="${ROOT_DIR}/${STEM}_results"
+OUT_DIR="${ROOT_DIR}/results/${STEM}_results"
 PHASED_DIR="${OUT_DIR}/phased_dir"
 IMPUTED_DIR="${OUT_DIR}/imputed_dir"
 
@@ -116,58 +116,64 @@ tabix -f -p vcf "$CHR_VCF"
 log "  ✓ Genome build conversion complete"
 
 ### ─────────────────────────── 7. Eagle phasing ────────────────────────────###
-log "Step 7/9: Starting Eagle phasing (chromosomes 1-22)..."
-for CHR in {1..22}; do
-  log "  - Phasing chromosome ${CHR}/22..."
-  "$EAGLE" \
-    --vcfRef        "${REF_DIR_EAGLE}/1000GP_dedup_chr${CHR}.bcf" \
-    --vcfTarget     "$CHR_VCF" \
-    --geneticMapFile "${MAP_DIR_EAGLE}/eagle_chr${CHR}_b38.map" \
-    --chrom         "$CHR" \
-    --outPrefix     "${PHASED_DIR}/${STEM}_phased_chr${CHR}" \
-    --numThreads    4 \
-    --allowRefAltSwap
-  log "    ✓ Chromosome ${CHR} phased"
-done
-log "  ✓ All chromosomes phased"
+# COMMENTED OUT FOR TESTING - This step is very time-consuming
+# log "Step 7/9: Starting Eagle phasing (chromosomes 1-22)..."
+# for CHR in {1..22}; do
+#   log "  - Phasing chromosome ${CHR}/22..."
+#   "$EAGLE" \
+#     --vcfRef        "${REF_DIR_EAGLE}/1000GP_dedup_chr${CHR}.bcf" \
+#     --vcfTarget     "$CHR_VCF" \
+#     --geneticMapFile "${MAP_DIR_EAGLE}/eagle_chr${CHR}_b38.map" \
+#     --chrom         "$CHR" \
+#     --outPrefix     "${PHASED_DIR}/${STEM}_phased_chr${CHR}" \
+#     --numThreads    4 \
+#     --allowRefAltSwap
+#   log "    ✓ Chromosome ${CHR} phased"
+# done
+# log "  ✓ All chromosomes phased"
+log "Step 7/9: Eagle phasing SKIPPED for testing"
 
 ### ─────────────────────────── 8. Beagle imput. ────────────────────────────###
-log "Step 8/9: Starting Beagle imputation (chromosomes 1-22)..."
-for CHR in {1..22}; do
-  GT=${PHASED_DIR}/${STEM}_phased_chr${CHR}.vcf.gz
-  REF=${REF_DIR_BEAGLE}/1000GP_dedup_chr${CHR}.bref
-  MAP=${MAP_DIR_BEAGLE}/beagle_chr${CHR}_b38.map
-  for f in "$GT" "$REF" "$MAP"; do
-    [[ -f $f ]] || { log "    ⚠ Skipping chr${CHR} (missing $f)"; continue 2; }
-  done
-  log "  - Imputing chromosome ${CHR}/22..."
-  java -Xmx8g -jar "$JAR" \
-       gt="$GT" \
-       ref="$REF" \
-       map="$MAP" \
-       impute=true \
-       out=${IMPUTED_DIR}/${STEM}_imputed_chr${CHR} \
-       nthreads=4
-  log "    ✓ Chromosome ${CHR} imputed"
-done
-log "  ✓ All chromosomes imputed"
+# COMMENTED OUT FOR TESTING - This step is very time-consuming
+# log "Step 8/9: Starting Beagle imputation (chromosomes 1-22)..."
+# for CHR in {1..22}; do
+#   GT=${PHASED_DIR}/${STEM}_phased_chr${CHR}.vcf.gz
+#   REF=${REF_DIR_BEAGLE}/1000GP_dedup_chr${CHR}.bref
+#   MAP=${MAP_DIR_BEAGLE}/beagle_chr${CHR}_b38.map
+#   for f in "$GT" "$REF" "$MAP"; do
+#     [[ -f $f ]] || { log "    ⚠ Skipping chr${CHR} (missing $f)"; continue 2; }
+#   done
+#   log "  - Imputing chromosome ${CHR}/22..."
+#   java -Xmx8g -jar "$JAR" \
+#        gt="$GT" \
+#        ref="$REF" \
+#        map="$MAP" \
+#        impute=true \
+#        out=${IMPUTED_DIR}/${STEM}_imputed_chr${CHR} \
+#        nthreads=4
+#   log "    ✓ Chromosome ${CHR} imputed"
+# done
+# log "  ✓ All chromosomes imputed"
+log "Step 8/9: Beagle imputation SKIPPED for testing"
 
 ### ─────────────────────── 9. concatenate chr1-22 ─────────────────────────###
-log "Step 9/9: Finalizing results..."
-log "  - Indexing imputed chromosomes..."
-for CHR in {1..22}; do
-  tabix -f -p vcf "${IMPUTED_DIR}/${STEM}_imputed_chr${CHR}.vcf.gz"
-done
+# COMMENTED OUT FOR TESTING - No imputed files to concatenate
+# log "Step 9/9: Finalizing results..."
+# log "  - Indexing imputed chromosomes..."
+# for CHR in {1..22}; do
+#   tabix -f -p vcf "${IMPUTED_DIR}/${STEM}_imputed_chr${CHR}.vcf.gz"
+# done
+# 
+# log "  - Concatenating all chromosomes..."
+# LIST=$(mktemp)
+# for CHR in {1..22}; do
+#   echo "${IMPUTED_DIR}/${STEM}_imputed_chr${CHR}.vcf.gz" >> "$LIST"
+# done
+# bcftools concat -f "$LIST" -Oz -o "$FINAL_VCF"
+# tabix -f -p vcf "$FINAL_VCF"
+# rm -f "$LIST"
+log "Step 9/9: Final concatenation SKIPPED for testing"
 
-log "  - Concatenating all chromosomes..."
-LIST=$(mktemp)
-for CHR in {1..22}; do
-  echo "${IMPUTED_DIR}/${STEM}_imputed_chr${CHR}.vcf.gz" >> "$LIST"
-done
-bcftools concat -f "$LIST" -Oz -o "$FINAL_VCF"
-tabix -f -p vcf "$FINAL_VCF"
-rm -f "$LIST"
-
-log "✓ Pipeline completed successfully!"
-log "✓ Final imputed file: $FINAL_VCF"
+log "✓ Pipeline completed successfully (TEST MODE - phasing and imputation skipped)!"
+log "✓ Intermediate file: $CHR_VCF"
 log "✓ Results directory: $OUT_DIR"
