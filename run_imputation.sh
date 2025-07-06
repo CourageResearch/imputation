@@ -39,8 +39,8 @@ MAP_DIR_BEAGLE="${ROOT_DIR}/static_files/beagle_maps"
 JAR="${ROOT_DIR}/static_files/jars/beagle.27Jan18.7e1.jar"
 EAGLE="${ROOT_DIR}/static_files/bin/eagle"
 
-ADDCHR_MAP="${ROOT_DIR}/static_files/scripts/addchr.txt"
-DROPCHR_MAP="${ROOT_DIR}/static_files/scripts/dropchr.txt"
+ADDCHR_MAP="${ROOT_DIR}/scripts/addchr.txt"
+DROPCHR_MAP="${ROOT_DIR}/scripts/dropchr.txt"
 
 # ---- per-sample folders & files ------------------------------------------- #
 OUT_DIR="${ROOT_DIR}/results/${STEM}_results"
@@ -74,46 +74,46 @@ else
   log "  ✓ Compressed and copied file"
 fi
 
-### ─────────────────────────── 3. TSV→VCF (GRCh37) ─────────────────────────###
-log "Step 3/9: Converting TSV to VCF (build37)..."
-bcftools convert --tsv2vcf "$RAW_GZ" -f "$FASTA_37" -s "$STEM" -Oz -o "$VCF_GZ"
-tabix -f -p vcf "$VCF_GZ"
-log "  ✓ VCF created and indexed"
+# ### ─────────────────────────── 3. TSV→VCF (GRCh37) ─────────────────────────###
+# log "Step 3/9: Converting TSV to VCF (build37)..."
+# bcftools convert --tsv2vcf "$RAW_GZ" -f "$FASTA_37" -s "$STEM" -Oz -o "$VCF_GZ"
+# tabix -f -p vcf "$VCF_GZ"
+# log "  ✓ VCF created and indexed"
 
-### ─────────────────────────── 4. add chr prefix ───────────────────────────###
-log "Step 4/9: Adding chromosome prefixes..."
-bcftools annotate --rename-chrs "$ADDCHR_MAP" -Oz -o "$VCF_CHR_GZ" "$VCF_GZ"
-tabix -f -p vcf "$VCF_CHR_GZ"
-log "  ✓ Chromosome prefixes added"
+# ### ─────────────────────────── 4. add chr prefix ───────────────────────────###
+# log "Step 4/9: Adding chromosome prefixes..."
+# bcftools annotate --rename-chrs "$ADDCHR_MAP" -Oz -o "$VCF_CHR_GZ" "$VCF_GZ"
+# tabix -f -p vcf "$VCF_CHR_GZ"
+# log "  ✓ Chromosome prefixes added"
 
-### ─────────────────────────── 5. fix missing ALT ──────────────────────────###
-log "Step 5/9: Patching missing ALT alleles (this may take several minutes)..."
-python static_files/scripts/alt_fix.py  "$VCF_CHR_GZ"
-# alt_fix.py writes ${STEM}.build37.chr.alt.vcf.gz in the same folder
-log "  ✓ ALT alleles patched"
+# ### ─────────────────────────── 5. fix missing ALT ──────────────────────────###
+# log "Step 5/9: Patching missing ALT alleles (this may take several minutes)..."
+# python scripts/alt_fix.py  "$VCF_CHR_GZ"
+# # alt_fix.py writes ${STEM}.build37.chr.alt.vcf.gz in the same folder
+# log "  ✓ ALT alleles patched"
 
-### ─────────────────────── 6. nochr → liftover → chr ───────────────────────###
-log "Step 6/9: Performing genome build conversion (chr→nochr→liftover→chr)..."
-log "  - Removing chr prefixes for CrossMap..."
-bcftools annotate --rename-chrs "$DROPCHR_MAP" -Oz -o "$NOCHR_VCF" "$RAW_VCF"
-tabix -f -p vcf "$NOCHR_VCF"
+# ### ─────────────────────── 6. nochr → liftover → chr ───────────────────────###
+# log "Step 6/9: Performing genome build conversion (chr→nochr→liftover→chr)..."
+# log "  - Removing chr prefixes for CrossMap..."
+# bcftools annotate --rename-chrs "$DROPCHR_MAP" -Oz -o "$NOCHR_VCF" "$RAW_VCF"
+# tabix -f -p vcf "$NOCHR_VCF"
 
-log "  - Running CrossMap liftover to GRCh38 (this may take several minutes)..."
-CrossMap.py vcf "$CHAIN" "$NOCHR_VCF" "$FASTA_38" "$LIFT_VCF"
+# log "  - Running CrossMap liftover to GRCh38 (this may take several minutes)..."
+# CrossMap.py vcf "$CHAIN" "$NOCHR_VCF" "$FASTA_38" "$LIFT_VCF"
 
-log "  - Sorting and compressing..."
-bcftools sort "$LIFT_VCF" -Oz -o "$SORT_VCF"
-tabix -f -p vcf "$SORT_VCF"
+# log "  - Sorting and compressing..."
+# bcftools sort "$LIFT_VCF" -Oz -o "$SORT_VCF"
+# tabix -f -p vcf "$SORT_VCF"
 
-log "  - Filtering to primary contigs..."
-CONTIGS=$(printf '%s,' {1..22} X Y MT); CONTIGS=${CONTIGS%,}
-bcftools view -r "$CONTIGS" -Oz -o "$PRIM_VCF" "$SORT_VCF"
-tabix -f -p vcf "$PRIM_VCF"
+# log "  - Filtering to primary contigs..."
+# CONTIGS=$(printf '%s,' {1..22} X Y MT); CONTIGS=${CONTIGS%,}
+# bcftools view -r "$CONTIGS" -Oz -o "$PRIM_VCF" "$SORT_VCF"
+# tabix -f -p vcf "$PRIM_VCF"
 
-log "  - Adding chr-prefix again..."
-bcftools annotate --rename-chrs "$ADDCHR_MAP" -Oz -o "$CHR_VCF" "$PRIM_VCF"
-tabix -f -p vcf "$CHR_VCF"
-log "  ✓ Genome build conversion complete"
+# log "  - Adding chr-prefix again..."
+# bcftools annotate --rename-chrs "$ADDCHR_MAP" -Oz -o "$CHR_VCF" "$PRIM_VCF"
+# tabix -f -p vcf "$CHR_VCF"
+# log "  ✓ Genome build conversion complete"
 
 ### ─────────────────────────── 7. Eagle phasing ────────────────────────────###
 # COMMENTED OUT FOR TESTING - This step is very time-consuming
@@ -174,6 +174,6 @@ log "Step 8/9: Beagle imputation SKIPPED for testing"
 # rm -f "$LIST"
 log "Step 9/9: Final concatenation SKIPPED for testing"
 
-log "✓ Pipeline completed successfully (TEST MODE - phasing and imputation skipped)!"
-log "✓ Intermediate file: $CHR_VCF"
+log "✓ Pipeline completed successfully (MINIMAL MODE - only file preparation completed)!"
+log "✓ Input file: $RAW_GZ"
 log "✓ Results directory: $OUT_DIR"

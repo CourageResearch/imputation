@@ -1,13 +1,5 @@
 # Large data files
-static_files/beagle_maps/
-static_files/ref_brefs/
-static_files/ref_bcfs/
-static_files/eagle_maps/
-static_files/chain/
-static_files/fasta/
-static_files/jars/
-static_files/bin/
-static_files/alt_alleles.db
+static_files/
 target_genomes/
 
 # Results directories

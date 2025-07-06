@@ -58,11 +58,12 @@ static_files/
 ├── jars/
 │   └── beagle.27Jan18.7e1.jar        # Beagle v4.1 JAR file
 ├── ref_bcfs/                         # Eagle reference BCF files (chr1-22)
-├── ref_brefs/                        # Beagle reference BREF files (chr1-22)
-└── scripts/
-    ├── addchr.txt                    # Chromosome prefix mapping
-    ├── alt_fix.py                    # ALT allele patching script
-    └── dropchr.txt                   # Chromosome prefix removal mapping
+└── ref_brefs/                        # Beagle reference BREF files (chr1-22)
+
+scripts/
+├── addchr.txt                        # Chromosome prefix mapping
+├── alt_fix.py                        # ALT allele patching script
+└── dropchr.txt                       # Chromosome prefix removal mapping
 ```
 
 ### Input Format

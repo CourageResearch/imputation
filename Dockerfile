@@ -19,7 +19,7 @@ ENV PATH /opt/conda/envs/imputation-env/bin:$PATH
 
 # Copy scripts and pipeline (but not large data)
 COPY run_imputation.sh ./
-COPY static_files/scripts/ ./static_files/scripts/
+COPY scripts/ ./scripts/
 
 # Make scripts executable
 RUN chmod +x run_imputation.sh
