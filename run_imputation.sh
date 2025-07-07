@@ -12,11 +12,17 @@ log() {
 }
 
 ### ───────────────────────────── 0. sanity ─────────────────────────────────###
-[[ $# == 1 ]] || { echo "Usage: $0 target_genomes/<sample>.txt[.gz]"; exit 1; }
-IN_TXT=$1
+# Use environment variable or command line argument
+JOB_UUID=${JOB_UUID:-"default"}
+if [[ $# == 1 ]]; then
+    IN_TXT=$1
+else
+    IN_TXT="/imputation/uploads/${JOB_UUID}.txt"
+fi
+
 [[ -f $IN_TXT ]] || { echo "Input file not found: $IN_TXT"; exit 1; }
 
-log "Starting imputation pipeline for: $IN_TXT"
+log "Starting imputation pipeline for: $IN_TXT (UUID: $JOB_UUID)"
 
 ### ─────────────────────────── 1. paths/vars ───────────────────────────────###
 ROOT_DIR=$(pwd)                            # run script from project root
@@ -43,11 +49,11 @@ ADDCHR_MAP="${ROOT_DIR}/scripts/addchr.txt"
 DROPCHR_MAP="${ROOT_DIR}/scripts/dropchr.txt"
 
 # ---- per-sample folders & files ------------------------------------------- #
-OUT_DIR="${ROOT_DIR}/results/${STEM}_results"
+OUT_DIR="/imputation/results/${JOB_UUID}"
 PHASED_DIR="${OUT_DIR}/phased_dir"
 IMPUTED_DIR="${OUT_DIR}/imputed_dir"
 
-RAW_GZ="${OUT_DIR}/${STEM}.txt.gz"
+RAW_GZ="${OUT_DIR}/${JOB_UUID}.txt.gz"
 
 VCF_GZ="${OUT_DIR}/${STEM}.build37.vcf.gz"
 VCF_CHR_GZ="${OUT_DIR}/${STEM}.build37.chr.vcf.gz"
