@@ -1,0 +1,47 @@
+version: '3.8'
+
+services:
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf.http:/etc/nginx/nginx.conf
+    depends_on:
+      - backend
+      - frontend
+    restart: unless-stopped
+
+  backend:
+    build:
+      context: ./web_ui/backend
+    command: uvicorn main:app --host 0.0.0.0 --port 8000
+    expose:
+      - "8000"
+    volumes:
+      - ./web_ui/uploads:/app/uploads
+      - ./web_ui/results:/app/results
+    working_dir: /app
+    environment:
+      - PYTHONUNBUFFERED=1
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./web_ui/frontend
+      dockerfile: Dockerfile.prod
+    expose:
+      - "3000"
+    working_dir: /app
+    restart: unless-stopped
+
+  imputation:
+    build: .
+    volumes:
+      - ./static_files:/imputation/static_files
+      - ./web_ui/uploads:/imputation/uploads
+      - ./web_ui/results:/imputation/results
+    environment:
+      - JAVA_OPTS=-Xmx8g
+    # This service is started by the backend as needed, not on up
+    entrypoint: ["sleep", "infinity"] 
