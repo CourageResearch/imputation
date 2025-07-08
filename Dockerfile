@@ -25,7 +25,7 @@ COPY scripts/ ./scripts/
 RUN chmod +x run_imputation.sh
 
 # Set up volumes for large data
-VOLUME ["/imputation/static_files", "/imputation/target_genomes"]
+# VOLUME ["/imputation/static_files", "/imputation/target_genomes"]
 
 # Entrypoint for the pipeline
 ENTRYPOINT ["/imputation/run_imputation.sh"] 
