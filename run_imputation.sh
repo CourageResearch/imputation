@@ -12,13 +12,8 @@ log() {
 }
 
 ### ───────────────────────────── 0. sanity ─────────────────────────────────###
-# Use environment variable or command line argument
 JOB_UUID=${JOB_UUID:-"default"}
-if [[ $# == 1 ]]; then
-    IN_TXT=$1
-else
-    IN_TXT="/imputation/uploads/${JOB_UUID}.txt"
-fi
+IN_TXT="/imputation/uploads/${JOB_UUID}.txt"
 
 [[ -f $IN_TXT ]] || { echo "Input file not found: $IN_TXT"; exit 1; }
 
