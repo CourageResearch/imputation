@@ -132,7 +132,8 @@ async def run_docker_processing(job_uuid: str):
             job["completed_at"] = datetime.now().isoformat()
         else:
             job["status"] = "error"
-            job["error"] = stderr.decode()
+            job["error"] = f"STDOUT: {stdout.decode()}\nSTDERR: {stderr.decode()}"
+            print(f"DOCKER ERROR (UUID: {job_uuid}):\nSTDOUT:\n{stdout.decode()}\nSTDERR:\n{stderr.decode()}")
             
     except Exception as e:
         job["status"] = "error"
