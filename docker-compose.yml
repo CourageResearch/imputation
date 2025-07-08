@@ -1,6 +1,31 @@
 version: '3.8'
 
 services:
+  backend:
+    build:
+      context: ./web_ui/backend
+    command: uvicorn main:app --host 0.0.0.0 --port 8000
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./web_ui/uploads:/app/uploads
+      - ./web_ui/results:/app/results
+    working_dir: /app
+    environment:
+      - PYTHONUNBUFFERED=1
+
+  frontend:
+    build:
+      context: ./web_ui/frontend
+    command: npm start
+    ports:
+      - "3000:3000"
+    working_dir: /app
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+    stdin_open: true
+    tty: true
+
   imputation:
     build: .
     volumes:
@@ -9,15 +34,5 @@ services:
       - ./web_ui/results:/imputation/results
     environment:
       - JAVA_OPTS=-Xmx8g
-      - JOB_UUID=${JOB_UUID:-default}
-    deploy:
-      resources:
-        limits:
-          memory: 10G
-        reservations:
-          memory: 8G
-    # Remove hardcoded command - will be passed by FastAPI
-    # command: ["target_genomes/genome_AB.txt"]
-    # Uncomment the line below to run interactively
-    # stdin_open: true
-    # tty: true 
+    # This service is started by the backend as needed, not on up
+    entrypoint: ["sleep", "infinity"]
